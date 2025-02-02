@@ -16,6 +16,11 @@ class Vector2{
 
     }
 
+    Length2(){
+        return this.x * this.x + this.y * this.y;
+    }
+
+
     GetNormal(){
         return new Vector2(this.y, -this.x);
 

@@ -2,7 +2,6 @@ class Simulation{
     constructor(){
         this.particles = [];
         this.fluidHashGrid = new FluidHashGrid(25);
-        
         this.AMMOUNT_PARTICLES = 500;
         this.VELOCITY_DAMPING = 1;
         
@@ -31,24 +30,38 @@ class Simulation{
         }
         }
 
+
+    circleTrackMouse(mousePos){
+        DrawUtils.strokePoint(mousePos, 25, "#ffffff")
+    }
+
     neighbourSearch(mousePos){
         this.fluidHashGrid.clearGrid();
         this.fluidHashGrid.mapParticlesToCell();
 
-        let gridHashId = this.fluidHashGrid.getGridHashFromPos(mousePos);
-        let contentOfCell = this.fluidHashGrid.getContentOfCell(gridHashId);
+        this.particles[0].position = mousePos.Cpy();
+
+        let contentOfCell = this.fluidHashGrid.getNeighborOfParticleIdx(0);
+
+
         for(let i=0; i<this.particles.length; i++){
             this.particles[i].color="#28b0ff";
         }
         for(let i=0; i<contentOfCell.length; i++){
             let particle = contentOfCell[i];
-            particle.color="orange";
+            let direction = Sub(particle.position, mousePos);
+            let distanceSquared = direction.Length2();
+            if(distanceSquared < 25*25){
+                particle.color="orange";
+            }
+
         }
     }
 
     update(dt, mousePos){
+        this.circleTrackMouse(mousePos);
+
         this.neighbourSearch(mousePos);
-        
         // this.predictPositions(dt);
         // this.computeNextVelocity(dt);
 
