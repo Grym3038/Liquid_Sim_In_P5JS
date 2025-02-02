@@ -1,10 +1,13 @@
 class Simulation{
     constructor(){
         this.particles = [];
-        this.AMMOUNT_PARTICLES = 2;
-        this.VELOCITY_DAMPING = .999;
+        this.fluidHashGrid = new FluidHashGrid(25);
+        
+        this.AMMOUNT_PARTICLES = 500;
+        this.VELOCITY_DAMPING = 1;
         
         this.instantiateParticles();
+        this.fluidHashGrid.initialize(this.particles);
     }
 
     instantiateParticles(){
@@ -28,9 +31,27 @@ class Simulation{
         }
         }
 
-    update(dt){
-        this.predictPositions(dt);
-        this.computeNextVelocity(dt);
+    neighbourSearch(mousePos){
+        this.fluidHashGrid.clearGrid();
+        this.fluidHashGrid.mapParticlesToCell();
+
+        let gridHashId = this.fluidHashGrid.getGridHashFromPos(mousePos);
+        let contentOfCell = this.fluidHashGrid.getContentOfCell(gridHashId);
+        for(let i=0; i<this.particles.length; i++){
+            this.particles[i].color="#28b0ff";
+        }
+        for(let i=0; i<contentOfCell.length; i++){
+            let particle = contentOfCell[i];
+            particle.color="orange";
+        }
+    }
+
+    update(dt, mousePos){
+        this.neighbourSearch(mousePos);
+        
+        // this.predictPositions(dt);
+        // this.computeNextVelocity(dt);
+
         this.worldBounds();
     }
 
