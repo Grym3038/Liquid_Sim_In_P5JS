@@ -17,17 +17,21 @@ class Vector2{
     }
 
     GetNormal(){
-        return Vector2(this.y, -this.x);
+        return new Vector2(this.y, -this.x);
 
     }
 
     Dot(vec){
-        return this.x * vec.x + this.y + vec.y
+        return this.x * vec.x + this.y * vec.y;
     }
 
     Log(){
         console.log("Vector2: "+this.x, this.y);
 
+    }
+    
+    Cpy(){
+        return new Vector2(this.x, this.y);
     }
 
     static Zero(){
