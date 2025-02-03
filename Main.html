@@ -43,7 +43,7 @@
                 window.requestAnimationFrame(mainLoop);
 
                 currentTime = performance.now();
-                deltaTime = (currentTime - lastTime) / 1000;
+                deltaTime = (currentTime - lastTime) / 100;
 
                 updatePlayground(deltaTime);
                 lastTime= currentTime;
