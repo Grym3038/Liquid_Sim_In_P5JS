@@ -3,12 +3,18 @@ class Simulation{
         this.particles = [];
         
         this.AMMOUNT_PARTICLES = 2000;
-        this.VELOCITY_DAMPING = 1;
+        this.VELOCITY_DAMPING = 0.999;
         this.GRAVITY = new Vector2(0, 1);
-        this.REST_DENSITY = 20;
+        this.REST_DENSITY = 10;
         this.K_NEAR = 3;
-        this.K = .25;
+        //particle attraction
+        this.K = .5;
         this.INTERACTION_RADIUS = 25;
+
+        //viscouse perams
+        this.SIGMA = 0.1;
+        this.BETA = 0.02;
+
 
         this.fluidHashGrid = new FluidHashGrid(this.INTERACTION_RADIUS);
         this.instantiateParticles();
@@ -70,7 +76,11 @@ class Simulation{
 
     update(dt){
         this.applyGravity(dt);
+
+        this.viscosity(dt);
+
         this.predictPositions(dt);
+
         this.neighbourSearch();
 
         this.doubleDensityRelaxation(dt);
@@ -80,6 +90,47 @@ class Simulation{
         this.worldBounds();
 
         this.computeNextVelocity(dt);
+
+    }
+
+
+    viscosity(dt){
+        for(let i=0; i< this.particles.length; i++){
+            let neighbors = this.fluidHashGrid.getNeighborOfParticleIdx(i);
+            let particleA = this.particles[i];
+
+            for(let j=0; j< neighbors.length; j++){
+                let particleB = neighbors[j];
+                if(particleA == particleB) continue;
+
+                let rij = Sub(particleB.position, particleA.position);
+                let velocityA = particleA.velocity;
+                let velocityB = particleB.velocity;
+                let q = rij.Length() / this.INTERACTION_RADIUS;
+
+                if(q < 1){
+                    rij.Normalize();
+                    let u = Sub(velocityA, velocityB).Dot(rij);
+
+                    if(u > 0){
+                        let ITerm = dt * (1-q) * (this.SIGMA * u + this.BETA * u * u);
+                        let I = Scale(rij, ITerm);
+
+                        particleA.velocity = Sub(particleA.velocity, Scale(I, 0.5));
+                        particleB.velocity = Add(particleB.velocity, Scale(I, 0.5));
+
+                    }
+
+
+
+                }
+
+            }
+
+
+
+        }
+
 
     }
 
