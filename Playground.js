@@ -21,13 +21,12 @@ class Playground {
     onMouseDown(button){
         console.log("Mouse button Pressed: "+button + " type: " + typeof button)
         if(button == 0){
-            this.simulation.spawn = !this.simulation.spawn;
+            
         }
     }
 
     onMiddleMouseBtnDown(button){
         console.log("Rotation Toggled!");
-        this.simulation.rotate = !this.simulation.rotate;
         
     }
 
@@ -38,16 +37,23 @@ class Playground {
     keyBoardBtnDown(event){
         switch (event.key.toLowerCase()) {
             case 's':
-                console.log("S key pressed");
-                // Your code for when S is pressed
+                console.log(`Key ${event.key} pressed`);
+                this.simulation.spawnBool = !this.simulation.spawnBool;
                 break;
             case 'p':
-                console.log("P key pressed");
-                // Your code for when A is pressed
+                console.log(`Key ${event.key} pressed`);
+
+                this.simulation.plasticBool = !this.simulation.plasticBool;
                 break;
             case 'v':
-                console.log("V key pressed");
-                // Your code for when D is pressed
+                console.log(`Key ${event.key} pressed`);
+
+                this.simulation.viscosityBool = !this.simulation.viscosityBool;
+                break;
+            case 'r':
+                console.log(`Key ${event.key} pressed`);
+
+                this.simulation.rotateBool = !this.simulation.rotateBool;
                 break;
             default:
                 // Optionally handle other keys

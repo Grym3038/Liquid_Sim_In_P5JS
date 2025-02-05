@@ -101,11 +101,11 @@ class Simulation{
 
     update(dt){
         this.neighbourSearch();
-        if(this.spawn){
+        if(this.spawnBool){
         this.emitter.spawn(dt, this.particles);
         }
         
-        if(this.rotate){
+        if(this.rotateBool){
             this.emitter.rotate(0.01);
         }
 
@@ -117,7 +117,7 @@ class Simulation{
 
         this.predictPositions(dt);
 
-        if(this.plastic){
+        if(this.plasticBool){
         this.adjustSprings(dt);
         this.springDisplacement(dt);
         }
