@@ -19,7 +19,13 @@ class Playground {
     }
 
     onMouseDown(button){
-        console.log("Mouse button Pressed: "+button)
+        console.log("Mouse button Pressed: "+button + " type: " + typeof button)
+    }
+
+    onMiddleMouseBtnDown(){
+        console.log("Rotation Toggled!");
+        this.simulation.rotate = !this.simulation.rotate;
+        
     }
 
     onMouseUp(button){
