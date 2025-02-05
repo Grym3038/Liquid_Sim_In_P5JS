@@ -12,13 +12,14 @@
         <canvas id="canvas" width="1280" height="720" style="border: solid 1px black;">
 
         </canvas>
-        <script src="Playground.js?v=1.0.2"></script>
-        <script src="Simulation.js?v=1.0.1"></script>
-        <script src="Vector2.js?v=1.0.1"></script>
-        <script src="DrawUtils.js?v=1.0.1"></script>
-        <script src="Particle.js?v=1.0.1"></script>
-        <script src="FluidHashGrid.js?v=1.0.1"></script>
-        <script src="ParticleEmitter.js?v=1.0.1"></script>
+        <script src="Playground.js?v=1.0.4"></script>
+        <script src="Simulation.js?v=1.0.21"></script>
+        <script src="Vector2.js?v=1.0.2"></script>
+        <script src="DrawUtils.js?v=1.0.2"></script>
+        <script src="Particle.js?v=1.0.2"></script>
+        <script src="FluidHashGrid.js?v=1.0.2"></script>
+        <script src="ParticleEmitter.js?v=1.0.2"></script>
+        <script src="Spring.js?v=1.0.2"></script>
 
 
 
@@ -79,6 +80,12 @@
             canvas.addEventListener('mouseup', function(evt){
                 playground.onMouseUp(evt.button);
             }, false)
+
+            document.addEventListener('keydown', (event) => {
+                playground.keyBoardBtnDown(event);
+            }, false)
+
+
 
         </script>
 

@@ -2,7 +2,8 @@ class Simulation{
     constructor(){
         this.particles = [];
         this.particleEmitters = [];
-        this.rotate;
+        this.springs = new Map();
+
 
         this.AMMOUNT_PARTICLES = 2000;
         this.VELOCITY_DAMPING = 1;
@@ -15,7 +16,13 @@ class Simulation{
 
         //viscouse perams
         this.SIGMA = 0.1;
-        this.BETA = 0.02;
+        this.BETA = 0.01;
+
+        //PLASTICITY perams
+        this.PLASTICITY = 1;
+        this.GAMMA = 0.3;
+        this.SPRING_STIFFNESS = .4;
+
 
 
         this.fluidHashGrid = new FluidHashGrid(this.INTERACTION_RADIUS);
@@ -93,9 +100,10 @@ class Simulation{
     }
 
     update(dt){
-
+        this.neighbourSearch();
+        if(this.spawn){
         this.emitter.spawn(dt, this.particles);
-
+        }
         
         if(this.rotate){
             this.emitter.rotate(0.01);
@@ -103,11 +111,16 @@ class Simulation{
 
         this.applyGravity(dt);
 
-        this.viscosity(dt);
+        if(this.viscosityBool){
+           this.viscosity(dt);
+        }
 
         this.predictPositions(dt);
 
-        this.neighbourSearch();
+        if(this.plastic){
+        this.adjustSprings(dt);
+        this.springDisplacement(dt);
+        }
 
         this.doubleDensityRelaxation(dt);
 
@@ -119,6 +132,76 @@ class Simulation{
 
     }
 
+    adjustSprings(dt) {
+        for(let i=0; i< this.particles.length; i++){
+            let neighbors = this.fluidHashGrid.getNeighborOfParticleIdx(i);
+            let particleA = this.particles[i];
+
+
+            for(let j=0; j< neighbors.length; j++){
+                let particleB = this.particles[neighbors[j]];
+                if(particleA == particleB) continue;
+            
+                let springId = i + neighbors[j] * this.particles.length;
+
+                if(this.springs.has(springId)) continue;
+
+                let rij = Sub(particleB.position, particleA.position);
+                let q = rij.Length() / this.INTERACTION_RADIUS;
+
+                if(q < 1){
+                let newSpring = new Spring(i, neighbors[j], this.INTERACTION_RADIUS);
+                this.springs.set(springId, newSpring);
+                }
+            }
+        }
+
+        for(let [key, spring] of this.springs){
+            let pi = this.particles[spring.particleAIdx];
+            let pj = this.particles[spring.particleBIdx];
+
+            let rij = Sub(pi.position, pj.position).Length();
+            let Lij = spring.length;
+            let d = this.GAMMA * Lij;
+
+            if(rij > Lij + d){
+                spring.length += dt * this.PLASTICITY * (rij - Lij - d); //stretching
+            }else if(rij < Lij - d){ 
+                spring.length -= dt * this.PLASTICITY * (Lij - d - rij); //compression
+            }
+
+            if(spring.length > this.INTERACTION_RADIUS){
+                this.springs.delete(key);
+            }
+
+        }
+
+
+    }
+
+    springDisplacement(dt){
+        let dtSquared = dt * dt;
+        for(let [key, spring] of this.springs){
+            let pi = this.particles[spring.particleAIdx];
+            let pj = this.particles[spring.particleBIdx];
+        
+            let rij = Sub(pi.position, pj.position);
+            let distance = rij.Length();
+
+            if(distance < 0.0001) continue;
+
+            rij.Normalize();
+            let displacementTerm = dtSquared * this.SPRING_STIFFNESS * 
+                (1 - spring.length / this.INTERACTION_RADIUS) * (spring.length - distance);
+
+            rij = Scale(rij, displacementTerm * 0.5);
+
+            pi.position = Add(pi.position, rij);
+            pj.position = Sub(pj.position, rij);
+
+        }
+    }
+
 
     viscosity(dt){
         for(let i=0; i< this.particles.length; i++){
@@ -126,7 +209,7 @@ class Simulation{
             let particleA = this.particles[i];
 
             for(let j=0; j< neighbors.length; j++){
-                let particleB = neighbors[j];
+                let particleB = this.particles[neighbors[j]];
                 if(particleA == particleB) continue;
 
                 let rij = Sub(particleB.position, particleA.position);
@@ -168,7 +251,7 @@ class Simulation{
             let particleA = this.particles[i];
             
             for(let j=0; j< neighbors.length; j++){
-                let particleB = neighbors[j];
+                let particleB = this.particles[neighbors[j]];
                 if(particleA == particleB){
                     continue;
                 }
@@ -187,7 +270,7 @@ class Simulation{
             let particleADisplacement = Vector2.Zero();
 
             for(let j=0; j< neighbors.length; j++){
-                let particleB = neighbors[j];
+                let particleB = this.particles[neighbors[j]];
                 if(particleA == particleB){
                     continue;
                 }
