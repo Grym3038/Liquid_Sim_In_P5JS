@@ -52,7 +52,7 @@ class Playground {
                 break;
             case 'r':
                 console.log(`Key ${event.key} pressed`);
-
+                
                 this.simulation.rotateBool = !this.simulation.rotateBool;
                 break;
             default:

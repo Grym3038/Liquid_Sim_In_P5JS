@@ -16,13 +16,7 @@ class DrawUtils{
         ctx.closePath();
     }
 
-    static strokePoint(position, radius, color, zIndex){
-        ctx.beginPath();
-        ctx.arc(position.x, position.y, radius, 0, Math.PI * 2, true);
-        ctx.strokeStyle= color;
-        ctx.stroke();
-        ctx.closePath();
-    }
+
 
     static drawLine(startPosition, endPosition, color, lineThickness = 1){
         ctx.beginPath();
