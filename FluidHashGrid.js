@@ -54,6 +54,26 @@ class FluidHashGrid{
 
     }
 
+    getNeighborsOfParticle(particle) {
+        let neighbors = [];
+        let pos = particle.position;
+        let particleGridX = parseInt(pos.x / this.cellSize);
+        let particleGridY = parseInt(pos.y / this.cellSize);
+    
+        for (let x = -1; x <= 1; x++) {
+            for (let y = -1; y <= 1; y++) {
+                let gridX = particleGridX + x;
+                let gridY = particleGridY + y;
+                let hashId = this.cellIndexToHash(gridX, gridY);
+                // Ensure we get an array back even if the cell is empty
+                let content = this.getContentOfCell(hashId) || [];
+                neighbors.push(...content);
+            }
+        }
+        return neighbors;
+    }
+    
+
 
 
     mapParticlesToCell(){

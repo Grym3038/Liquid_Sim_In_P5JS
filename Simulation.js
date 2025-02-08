@@ -23,7 +23,7 @@ class Simulation{
         this.GAMMA = 0.3;
         this.SPRING_STIFFNESS = .4;
 
-
+        this.MousePosition = new Vector2();
 
         this.fluidHashGrid = new FluidHashGrid(this.INTERACTION_RADIUS);
         // this.instantiateParticles();
@@ -67,39 +67,41 @@ class Simulation{
         }
 
 
-    circleTrackMouse(mousePos){
-        DrawUtils.strokePoint(mousePos, this.INTERACTION_RADIUS, "#ffffff")
-    }
+        circleTrackMouse(mousePos) {
+            const radius = 25;
+            
+            // Draw the tracking circle at the mouse position
+            DrawUtils.strokePoint(mousePos, radius, "#ffffff");
+        
+            // Loop over all particles and check if they lie within the circle
+            for (let i = 0; i < this.particles.length; i++) {
+                let particle = this.particles[i];
+                // Calculate the vector from the mouse position to the particle position.
+                // If you have a vector subtraction function (Sub) and a method for squared length (Length2), you can use them:
+                let direction = Sub(particle.position, mousePos);
+                
+                // Check if the particle is within the radius (using squared distances for performance)
+                if (direction.Length2() < radius * radius) {
+                    particle.color = "orange";
+                } else {
+                    // Optionally, revert particles outside the circle to their default color.
+                    particle.color = "#28b0ff";
+                }
+            }
+        }
+        
 
     neighbourSearch(){
         this.fluidHashGrid.clearGrid();
         this.fluidHashGrid.mapParticlesToCell();
     }
 
-    neighbourSearchByMouse(mousePos){
-        this.fluidHashGrid.clearGrid();
-        this.fluidHashGrid.mapParticlesToCell();
 
-        this.particles[0].position = mousePos.Cpy();
+    
+    
 
-        let contentOfCell = this.fluidHashGrid.getNeighborOfParticleIdx(0);
-
-
-        for(let i=0; i<this.particles.length; i++){
-            this.particles[i].color="#28b0ff";
-        }
-        for(let i=0; i<contentOfCell.length; i++){
-            let particle = contentOfCell[i];
-            let direction = Sub(particle.position, mousePos);
-            let distanceSquared = direction.Length2();
-            if(distanceSquared < this.INTERACTION_RADIUS*this.INTERACTION_RADIUS){
-                particle.color="orange";
-            }
-
-        }
-    }
-
-    update(dt){
+    update(dt, mousePos){
+        this.MousePosition = mousePos;
         this.neighbourSearch();
         if(this.spawnBool){
         this.emitter.spawn(dt, this.particles);
@@ -124,7 +126,7 @@ class Simulation{
 
         this.doubleDensityRelaxation(dt);
 
-        // this.circleTrackMouse(mousePos);
+        this.circleTrackMouse(this.MousePosition);
 
         this.worldBounds();
 

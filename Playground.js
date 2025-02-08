@@ -5,8 +5,7 @@ class Playground {
     }
 
     update(dt){
-        this.simulation.update(0.25);
-
+        this.simulation.update(dt, this.mousePos);
     }
 
     draw(){
